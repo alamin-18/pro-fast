@@ -1,0 +1,142 @@
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { FaFacebook } from 'react-icons/fa6';
+import { FcGoogle } from 'react-icons/fc';
+import { Link } from 'react-router';
+import useAuth from '../../hooks/useAuth';
+
+const LogingPage = () => {
+    const {
+        register,       // to connect input fields
+        handleSubmit,   // handles form submission
+        formState: { errors } // validation errors
+    } = useForm();
+    const { signIn,signIngWithGoogle } = useAuth()
+    const onSubmit = (data) => {
+        signIn(data.email, data.password)
+            .then((result) => {
+                // Signed in 
+                const user = result.user;
+                // ...
+                console.log(user);
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+            });
+
+    }
+    const handaleGoogle = ()=>{
+        signIngWithGoogle()
+        .then(result => {
+                console.log(result.user);
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // ..
+                console.log(errorCode,errorMessage);
+            });
+    }
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+            <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+                <h1 className="text-3xl font-bold text-center text-gray-800">
+                    Welcome Back
+                </h1>
+                <p className="mt-2 text-center text-gray-500">Login with Profast</p>
+
+                <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-5">
+                    {/* Email */}
+                    <div>
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Email Address
+                        </label>
+                        <input
+                            type="email"
+                            {...register("email", { required: "Email is required" })}
+                            id="email"
+                            placeholder="Enter your email"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-3 text-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                            required
+                        />
+                    </div>
+
+                    {/* Password */}
+                    <div>
+                        <label
+                            htmlFor="password"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            {...register("password", { required: "Password is required", minLength: { value: 6, message: "Min length is 6" } })}
+                            id="password"
+                            placeholder="Enter your password"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-3 text-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                            required
+                        />
+                    </div>
+
+                    {/* Remember me + Forgot password */}
+                    <div className="flex items-center justify-between">
+
+                        <a href="#" className="text-sm font-medium text-indigo-600 hover:underline">
+                            Forgot password?
+                        </a>
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                        type="submit"
+                        className="w-full rounded-lg bg-[#CAEB66] py-3 text-white font-semibold shadow-md  focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                        Sign In
+                    </button>
+                </form>
+
+                {/* Divider */}
+                <div className="my-6 flex items-center justify-center">
+                    <span className="h-px w-full bg-gray-300"></span>
+                    <span className="px-3 text-sm text-gray-500">OR</span>
+                    <span className="h-px w-full bg-gray-300"></span>
+                </div>
+
+                {/* Social Login */}
+                <div className="flex flex-col space-y-3">
+                    {/* Google */}
+                    <button
+                        onClick={handaleGoogle}
+                        className="flex w-full items-center justify-center space-x-2 rounded-lg border border-gray-300 py-3 font-medium text-gray-600 hover:bg-gray-100"
+                    >
+                        <FcGoogle className="text-xl" />
+                        <span>Continue with Google</span>
+                    </button>
+
+                    {/* Facebook */}
+                    <button
+
+                        className="flex w-full items-center justify-center space-x-2 rounded-lg border border-gray-300 py-3 font-medium text-gray-600 hover:bg-gray-100"
+                    >
+                        <FaFacebook className="text-blue-600 text-xl" />
+                        <span>Continue with Facebook</span>
+                    </button>
+                </div>
+                {/* Sign Up */}
+                <p className="mt-6 text-center text-sm text-gray-600">
+                    Don’t have an account?{" "}
+                    <Link to='/register' className="font-medium text-indigo-600 hover:underline">
+                        Sign Up
+                    </Link>
+                </p>
+            </div>
+        </div>
+    );
+};
+
+export default LogingPage;
