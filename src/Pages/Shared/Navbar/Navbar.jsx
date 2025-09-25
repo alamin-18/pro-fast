@@ -3,16 +3,25 @@ import { useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi"; // heroicons from react-icons
 import ProFastLogo from "../ProFastLogo/ProFastLogo";
 import { Link } from "react-router";
+import useAuth from "../../../hooks/useAuth";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const {user,logOut} = useAuth()
+    const handelLogOut = ()=>{
+        logOut()
+        .then(()=>{})
+        .catch(error=>{
+            console.log(error);
+        })
+    }
     const NavbarMenu = <>
 
         <Link  className="text-gray-600 hover:text-lime-500">Services</Link>
         <Link to='coverage' className="text-gray-600 hover:text-lime-500">Coverage</Link>
         <Link  className="text-gray-600 hover:text-lime-500">About Us</Link>
-        <Link to='/add-parcel' className="text-gray-600Linkhover:text-lime-500">Add Parcel</Link>
-        <Link  className="text-gray-600 hover:text-lime-500">Be a Rider</Link>
+        <Link to='/add-parcel' className="text-gray-600 Link hover:text-lime-500">Add Parcel</Link>
+        <Link to='profile' className="text-gray-600 hover:text-lime-500">Profile</Link>
     </>;
     return (
         <nav className="bg-white shadow-sm">
@@ -28,14 +37,19 @@ export default function Navbar() {
 
                 {/* Desktop Buttons */}
                 <div className="hidden md:flex items-center space-x-3">
-                    <Link to='/login'>
+                    {
+                        user ? <button onClick={handelLogOut} className="font-bold">Logout</button>:<Link to='/login'>
                     <button className="border border-gray-300 px-4 py-1 rounded-lg hover:bg-gray-100">
                         Sign In
                     </button>
                     </Link>
-                    <button className="bg-lime-400 px-4 py-1 rounded-lg font-semibold hover:bg-lime-500">
+                    }
+                    <Link to='/become-a-rider'>
+                     <button className="bg-lime-400 px-4 py-1 rounded-lg font-semibold hover:bg-lime-500">
                         Be a rider
                     </button>
+                    </Link>
+
                     <button className="bg-black text-white p-2 rounded-full ">
                         <span className="text-lime-400">↗</span>
                     </button>

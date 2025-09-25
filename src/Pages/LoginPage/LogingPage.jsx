@@ -2,8 +2,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { FaFacebook } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import useAuth from '../../hooks/useAuth';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const LogingPage = () => {
     const {
@@ -12,6 +13,10 @@ const LogingPage = () => {
         formState: { errors } // validation errors
     } = useForm();
     const { signIn,signIngWithGoogle } = useAuth()
+    const axiosSecure = useAxiosSecure();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const from = location.state?.from || '/';
     const onSubmit = (data) => {
         signIn(data.email, data.password)
             .then((result) => {
@@ -19,6 +24,7 @@ const LogingPage = () => {
                 const user = result.user;
                 // ...
                 console.log(user);
+                navigate(from, { replace: true });
             })
             .catch((error) => {
                 const errorCode = error.code;
@@ -28,8 +34,10 @@ const LogingPage = () => {
     }
     const handaleGoogle = ()=>{
         signIngWithGoogle()
-        .then(result => {
-                console.log(result.user);
+        .then(async(result) => {
+                const res = await axiosSecure.post('/users', { name: result?.user.displayName, email: result?.user.email, role: 'customer' })
+                console.log(res);
+                navigate(from, { replace: true });
             })
             .catch((error) => {
                 const errorCode = error.code;

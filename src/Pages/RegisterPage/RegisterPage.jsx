@@ -2,8 +2,10 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { FaFacebook } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import useAuth from './../../hooks/useAuth';
+import Swal from 'sweetalert2';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const RegisterPage = () => {
     const {
@@ -11,11 +13,26 @@ const RegisterPage = () => {
         handleSubmit,   // handles form submission
         formState: { errors } // validation errors
     } = useForm();
+    const axiosSecure = useAxiosSecure();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const from = location.state?.from || '/';
     const { createUser,signIngWithGoogle } = useAuth()
     const onSubmit = (data) => {
         createUser(data.email, data.password)
-            .then(result => {
+            .then(async(result) => {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'User Created Successfully',
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
                 console.log(result.user);
+                    const saveUser = { name: result.user.displayName, email: result.user.email, role: 'customer' }
+                    const res = await axiosSecure.post('/users', saveUser)
+                    console.log('after posting new user', res.data);
+                navigate(from, { replace: true });
             })
             .catch((error) => {
                 const errorCode = error.code;
@@ -28,6 +45,12 @@ const RegisterPage = () => {
         signIngWithGoogle()
         .then(result => {
                 console.log(result.user);
+                const saveUser = { name: result.user.displayName, email: result.user.email, role: 'customer' }
+                    axiosSecure.post('/users', saveUser)
+                    .then(res => {
+                        console.log('after posting new user', res.data);
+                    })
+                navigate(from, { replace: true });
             })
             .catch((error) => {
                 const errorCode = error.code;
